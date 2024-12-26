@@ -1,0 +1,190 @@
+# the default umask is set in /etc/profile; for setting the umask
+# for ssh logins, install and configure the libpam-umask package.
+#umask 022
+
+path_prepend(){
+    if [ -d "$1" ]; then
+        case ":${PATH:=$1}:" in
+            *:"$1":*) ;;
+            *) PATH="$1:$PATH" ;;
+        esac;
+    fi
+}
+
+path_append(){
+    if [ -d "$1" ]; then
+        case ":${PATH:=$1}:" in
+            *:"$1":*) ;;
+            *) PATH="$PATH:$1" ;;
+        esac;
+    fi
+}
+
+command_exists(){
+    type "$1" 1>/dev/null 2>&1
+}
+
+
+# ----------------------------------------------------------------------
+# Startup
+# ----------------------------------------------------------------------
+
+# Source global profile
+if [ -f /etc/profile ]; then . /etc/profile 2>/dev/null; fi
+
+# if running bash, we need to explicitly include .bashrc
+if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then . "$HOME/.bashrc"; fi
+
+# common aliases
+if [ -f "$HOME/.aliases" ]; then . "$HOME/.aliases"; fi
+
+
+# ----------------------------------------------------------------------
+# Configure XDG Paths
+# ----------------------------------------------------------------------
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+#Go
+export GOPATH="${XDG_DATA_HOME}/go"
+
+# Postgres
+mkdir -p "$XDG_CONFIG_HOME/postgres"
+mkdir -p "$XDG_STATE_HOME/postgres"
+export PSQLRC="$XDG_CONFIG_HOME/postgres/psqlrc"
+export PSQL_HISTORY="$XDG_STATE_HOME/postgres/psql_history"
+export PGPASSFILE="$XDG_CONFIG_HOME/postgres/pgpass"
+export PGSERVICEFILE="$XDG_CONFIG_HOME/postgres/pgservice"
+
+# node
+mkdir -p "$XDG_STATE_HOME/node"
+export NODE_REPL_HISTORY="$XDG_STATE_HOME/node/repl_history"
+
+# less
+mkdir -p "$XDG_STATE_HOME/less"
+export LESSKEY="$XDG_CONFIG_HOME/less/lesskey"
+export LESSHISTFILE="$XDG_STATE_HOME/less/history"
+
+# asdf
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
+
+
+# ----------------------------------------------------------------------
+# Configure PATH
+# ----------------------------------------------------------------------
+
+# Local bin dirs
+path_prepend "$HOME/bin"
+path_prepend "$HOME/.local/bin"
+path_prepend /scripts
+
+# Go
+path_append "${XDG_DATA_DIR}/go/bin"
+
+# Terraform
+path_append "$HOME/.tfenv/bin"
+
+# NPM
+path_append "$HOME/.npm/global/bin"
+
+# Ruby gems
+if command_exists gem; then
+    path_append "$(gem env | sed -n 's/^  - USER INSTALLATION DIRECTORY: //p')/bin"
+fi
+
+# Haskell (GHCup)
+path_prepend "$HOME/.ghcup/bin"
+
+# Rust
+path_prepend "$HOME/.cargo/bin"
+
+
+# ----------------------------------------------------------------------
+# Configure Tools
+# ----------------------------------------------------------------------
+
+# praise vim
+export EDITOR=nvim
+
+# Determine available gui askpass
+if command_exists ksshaskpass; then
+    _ksshaskpass="$(command -pv ksshaskpass)"
+    export SUDO_ASKPASS="$_ksshaskpass"
+    export SSH_ASKPASS="$_ksshaskpass"
+elif command_exists ssh-askpass; then
+    _sshaskpass="$(command -pv ssh-askpass)"
+    export SUDO_ASKPASS="$_sshaskpass"
+    export SSH_ASKPASS="$_sshaskpass"
+fi
+
+# less with color support
+export PAGER='less -R'
+
+# Set tell GPG to use this tty
+# shellcheck disable=SC2155
+if tty -s; then export GPG_TTY=$(tty); fi
+
+# Stop systemd from paging every fucking thing
+export SYSTEMD_PAGER=''
+
+# Stop AWS CLI from paging
+export AWS_PAGER=''
+
+# Disable bat pager
+export BAT_PAGER=
+
+# Disable AWS SAM tracking
+export SAM_CLI_TELEMETRY=0
+
+# Dont ignore special chars when sorting
+export LC_COLLATE=C
+
+# scale plasma along with Qt
+export PLASMA_USE_QT_SCALING=1
+
+# Allow clickthrough of inactive windows in KDE plasma
+export GDK_CORE_DEVICE_EVENTS=1
+
+# GDK HiDPI
+export GDK_SCALE=1
+export GDK_DPI_SCALE=-1
+
+# bash sets HOST, but zsh sets HOSTNAME. Set them both.
+HOST="$(uname -n)"
+export HOSTNAME="$HOST"
+export HOST
+
+# Mac
+case ${OSTYPE} in
+    darwin*)
+        export CLICOLOR=1
+        export LSCOLORS=gxfxcxdxbxegedabagaced
+        # disable autoupdate
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        # disable auto clean
+        export HOMEBREW_NO_INSTALL_CLEAN=1
+        # prevent github lookups
+        export HOMEBREW_NO_GITHUB_API=1
+        # Disable homebrew analytics
+        export HOMEBREW_NO_ANALYTICS=1
+        # prevent copying of dotfiles (apparently)
+        export COPYFILE_DISABLE=true
+    ;;
+esac
+
+export PYTHONBREAKPOINT=ipdb.set_trace
+
+# Idiots at ipython love polluting home dirs
+export IPYTHONDIR=$HOME/.config/ipython
+
+# Multicore make by default
+# shellcheck disable=SC2155
+cores="$(grep -c '^processor' /proc/cpuinfo)"
+export MAKEFLAGS="-j$cores"
+
+# Use docker BuildKit
+export DOCKER_BUILDKIT=1
+

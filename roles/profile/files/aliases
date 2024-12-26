@@ -1,0 +1,385 @@
+#!/bin/sh
+
+# Enable colour in standard utils
+if ls --color -d . >/dev/null 2>&1; then
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Use colorls if it's installed
+if type colorls > /dev/null 2>&1; then
+    alias ls='colorls --sd --gs --no-hardlinks --time-style "+%Y/%d/%m %H:%M"' -G
+fi
+
+kernel_name="$(uname -s)"
+case "$(uname -s)" in
+    Linux*)     OS=Linux;;
+    Darwin*)    OS=MacOS;;
+    CYGWIN*)    OS=Cygwin;;
+    MINGW*)     OS=MinGw;;
+    *)          OS="${kernel_name}"
+esac
+
+case "${OS}" in
+    MacOS*)
+        alias Finder='open /System/Library/CoreServices/Finder.app'
+        #alias gmake='/Applications/TI/ccsv7/utils/bin/gmake'
+	    alias disableNotificationCenter="launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist && killall NotificationCenter"
+	    alias enableNotificationCenter="launchctl load -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist && open /System/Library/CoreServices/NotificationCenter.app/"
+        # `brew cask search` was removed by idiots
+        brew() { if [ "$1 $2" = "cask search" ]; then shift 1; fi; command brew "$@"; }
+        alias irssi-vim='PERL5LIB=$(find $(brew --cellar irssi) -name Irssi.pm -exec dirname {} \;) nvim'
+        ;;
+    *)
+        # pbcopy/paste to emulate macos
+        alias pbcopy='xsel --clipboard --input'
+        alias pbpaste='xsel --clipboard --output'
+        ;;
+esac
+
+
+# ----------------------------------------------------------------------------
+# Command replacements
+# ----------------------------------------------------------------------------
+
+# Use rename command from perl instead of util-linux
+if command -v perl-rename >/dev/null; then alias rename=perl-rename; fi
+
+# Use eza as ls if installed
+if command -v eza >/dev/null; then alias ls=eza; fi
+
+# replace youtube-dl with yt-dlp
+alias youtube-dl='yt-dlp'
+
+# ipython as calc if it exists, else use python
+alias calc='command -v ipython >/dev/null 2>&1 && ipython --no-confirm-exit || python'
+
+# Use nvim in VT100 mode as vim
+alias vim='TERM=vt100 nvim'
+
+# Midnight Commander wrapper (sets cwd on exit)
+if [ -f '/usr/share/mc/bin/mc-wrapper.sh' ]; then alias mc='. /usr/share/mc/bin/mc-wrapper.sh'
+elif [ -f '/usr/lib/mc/mc-wrapper.sh' ]; then alias mc='. /usr/lib/mc/mc-wrapper.sh';
+fi
+
+# ipython = ipython3
+if command -v ipython3 >/dev/null; then alias ipython='ipython3'; fi
+
+
+# ----------------------------------------------------------------------------
+# Shortcuts and options
+# ----------------------------------------------------------------------------
+
+# Generate QR codes
+alias qr='qrencode -t ansiutf8'
+
+# download best quality audio/video and mux into MKV container
+alias youtube-dl-best='youtube-dl -f bestvideo+bestaudio --merge-output-format mkv'
+alias youtube-dl-bestaudio='youtube-dl -f bestaudio --extract-audio --embed-thumbnail --add-metadata'
+
+# Disable caching and open in fit-mode
+alias sxiv='sxiv -sf -p'
+
+# ssh-add timeout
+alias ssh-add='ssh-add -t 9h'
+
+# better tab-completion, much lazy
+alias tilix-preferences='tilix --preferences'
+
+# help my fingers are bleeding
+alias sc='sudo systemctl --no-pager'
+
+# gimme open like macos
+alias open=xdg-open
+
+# strace file accesses
+alias strace-files='sudo strace -f -t -e trace=file -u $(id -un)'
+
+# Open notion in firefox using a dedicated profile and kiosk mode. Useful for tiling WMs
+alias notion-kiosk='firefox -new-window https://notion.so -P Notion -no-remote --kiosk --class=notion'
+
+# Docker version of GDAL tools
+alias gdal-docker='docker run --rm -v/home:/home -v/datasets:/datasets -v/data:/data -it ghcr.io/osgeo/gdal:alpine-normal-latest'
+
+# Freyr download songs from Spotify, Apple Music and Deezer
+alias freyr='docker run --user=$(id -u):$(id -g) -it --rm -v $PWD:/data freyrcli/freyrjs:latest'
+
+
+# ----------------------------------------------------------------------------
+# Fixes
+# ----------------------------------------------------------------------------
+
+# mutt does not recognise the HOSTNAME environment variable
+alias mutt='HOSTNAME=$(uname -n) MUTT=$(command -pv mutt 2>/dev/null || command -pv neomutt 2>/dev/null) $MUTT'
+
+# search is useless if it scans the entire description ffs
+apt() {
+    if [ "$1" = "search" ]; then /usr/bin/apt --names-only "$@"
+    else /usr/bin/apt "$@"
+    fi
+}
+
+# Why u make clear remove scrollback?
+alias clear='clear -x'
+
+# 'pip search' has been disabled. Replace it with something that works
+_pip(){
+    if command -v pip_search >/dev/null && [ "$1" = "search" ]; then
+        pip_search "$2"
+    else
+        # Temporary fix until pypa/pip/issues/6773 is resolved
+        #PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \pip "$@";
+        \pip "$@"
+    fi
+}
+alias pip=_pip
+
+# ----------------------------------------------------------------------------
+# Custom commands
+# ----------------------------------------------------------------------------
+
+# Si/No? Oui/Non? Hai/Iie? Ja/Nein? Da/Nyet? Yeah/Nah?
+yesno(){
+    while true; do
+        printf '%s [y/n]: ' "$1"
+        read -r yn
+        case $yn in
+            [Yy]*) return 0 ;;
+            [Nn]*) return 1 ;;
+        esac
+    done
+}
+
+# again again
+loop(){ while true; do clear; "$@"; echo "Press enter to rerun ..."; read -r _; done; }
+
+# Decode HTML URLs on stdin e.g. %20 -> " "
+urldecode(){ printf '%b\n' "$(sed -E -e 's/\+/ /g' -e 's/%([0-9a-fA-F]{2})/\\x\1/g')"; }
+
+# sample a CSV with header .g csv_subset 5 file.csv
+csv_subset(){ head -n1 "$2"; tail -n+2 "$2" | shuf -n "$1"; }
+
+alias make-list-targets='grep "^[^#[:space:]].*:" Makefile | sort'
+
+# Show mounted hard disk partitions (/dev/sd*)
+alias show-disks='mount  | grep "/dev/sd" | grep "/mnt/disk/" | sort -k3'
+
+# Arduino board listing
+alias arduino-boards='grep -E "^[[:alnum:]]+.name" /usr/share/arduino/hardware/arduino/boards.txt | sort -u | sed "s/.name=/:/" | column -s: -t'
+
+# get wan ip
+alias myip='curl wtfismyip.com/text'
+
+# play music from youtube based on search query
+mm() { mpv --load-unsafe-playlists --volume=50 --term-playing-msg='${media-title}' --no-video --ytdl-format=bestaudio ytdl://ytsearch10:"$*"; }
+
+# Send a desktop notification
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# list mounted devices and their size
+alias device-mounts="df -h --output=source,size,target | grep '/dev/\(mapper\|sd\|xvd\|nvme\)'"
+
+# Pleeeeeeeeaaaase? (run last cmd as root)
+alias pls='sudo -s eval $(fc -ln -1 | tee /dev/stderr )'
+alias please=pls
+
+# Delete all docker resources
+alias docker-fuckoff='docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker network prune -f; docker rmi -f $(docker images --filter dangling=true -qa); docker volume rm $(docker volume ls --filter dangling=true -q); docker rmi -f $(docker images -qa)'
+
+# Load AWS access keys from ~/.aws.config into environment
+alias aws-loadcredentials='source <(grep -A3 "[default]" ~/.aws/config | tail -n+2 | sed "s/aws_access_key_id\s\?=\s\?/export AWS_ACCESS_KEY_ID=/; s/aws_secret_access_key\s\?=\s\?/export AWS_SECRET_ACCESS_KEY=/; s/region\s\?=\s\?/export AWS_DEFAULT_REGION=/")'
+
+# git: pull all local branches
+alias git-pull-all='CURRENT_BRANCH=$(git branch --show-current); touch _STASH; git stash -u ; git fetch -ap; git for-each-ref refs/heads --format="%(refname:short)" | while read -r B; do ( git checkout "$B" && git branch --set-upstream-to="origin/$B" "$B" && git pull --ff-only ); echo "----------------------------------------"; done; git checkout "$CURRENT_BRANCH"; git stash pop; rm _STASH'
+
+# git: grep for pattern in all refs
+git_grep() {
+    git grep "$1" "$(git for-each-ref --format='%(refname)' refs/)"
+}
+alias git-grep=git_grep
+
+# git: checkout master and pull
+alias git-pull-master='git checkout master && git pull && git checkout -'
+
+# git: pull from main/master and merge into current branch, optionally push
+_git_sync(){
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    TARGET_BRANCH="${1:-$CURRENT_BRANCH}"
+    MAIN_BRANCH="$(git for-each-ref --format='%(refname:short)' refs/heads | grep main)"
+    if [ "${MAIN_BRANCH}" = "" ]; then
+        MAIN_BRANCH="master"
+    fi
+    (git checkout "${MAIN_BRANCH}" && git pull; err=$?; git checkout "${TARGET_BRANCH}"; return "$err") || return 1
+    if git merge "origin/${MAIN_BRANCH}" | grep -v 'Already up to date'; then
+        if yesno 'Push the updated branch?'; then
+            git push
+        fi
+    fi
+    git checkout "${CURRENT_BRANCH}"
+}
+alias git-sync=_git_sync
+
+# git: Merge main branch into target branch and push
+_git_deploy(){
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ -z "$CURRENT_BRANCH" ]; then return 1; fi
+    TARGET_BRANCH="$1"
+    if [ -z "$TARGET_BRANCH" ]; then echo "$0 [DEPLOY_BRANCH]"; return 1; fi
+    MAIN_BRANCH="$(git for-each-ref --format='%(refname:short)' refs/heads | grep main)"
+    if [ "${MAIN_BRANCH}" = "" ]; then
+        MAIN_BRANCH="master"
+    fi
+
+    git checkout "${MAIN_BRANCH}" && \
+    git pull && \
+    git checkout "${TARGET_BRANCH}" && \
+    git pull && \
+    git merge "origin/${MAIN_BRANCH}" -m "Deploy $1" && \
+    if yesno "Push branch '${TARGET_BRANCH}'?"; then
+        git push
+    fi
+    git checkout "${CURRENT_BRANCH}"
+}
+alias git-deploy=_git_deploy
+
+# Convert geospatial file to GPKG
+gpkg() { ogr2ogr -nlt MultiPolygon -progress "$1.gpkg" "$1"; }
+
+# Vacuum a GPKG
+alias gpkg-vacuum='ogrinfo -sql "VACUUM"'
+
+alias gdrive-sync-watcher='tail -n+1 -f ~/gdrive-sync.log | grep "Copied (new)" --line-buffered | sed "s/.*|\s*// ; s/:[^:]*\$// ; s/ INFO\s*://"'
+
+# Source .env file. Use sed to 1) remove comment 2) remove empty lines 3) trim spaces around equals 4) only print lines containing '='
+alias source_dotenv='. <(sed -n "/^\s*#/d; /^\s*$/d; s/^\([^= ]\+\)\s*=\s*/\1=/; /=/p" "$f" | envsubst)'
+
+# $1 is the .env file suffix. `dotenv local` will source file .env.local
+dotenv(){
+    if [ "$1" = "" ]; then f=".env"; else f=".env.$1"; fi
+    set -a
+    # shellcheck disable=SC1090,SC3001
+    . <(sed -n "/^\s*#/d; /^\s*$/d; s/^\([^= ]\+\)\s*=\s*/\1=/; /=/p" "$f" | envsubst)
+    set +a
+}
+
+# Use xpra to forward an X session over ssh
+_remote_desktop(){
+    xpra attach "ssh:$1:100" \
+        --dpi=144 \
+        --window-close=disconnect \
+        --ssh='ssh -L18000:localhost:8000'
+}
+alias remote-desktop=_remote_desktop
+
+# Based grep
+_source_search(){
+    i_flag="--no-ignore-case"
+    search=""
+    for arg in "$@"; do
+        case "$arg" in
+            -i) i_flag="--ignore-case" ;;
+            *)  search="$arg" ;;
+        esac
+    done
+    set -x
+    find . \( \
+        -name node_modules -o \
+        -name .mypy_cache -o \
+        -name .direnv -o \
+        -name venv -o \
+        -name .venv -o \
+        -name .idea -o \
+        -name .terraform -o \
+        -name .git -o \
+        -name vendor -o \
+        -name .aws-sam -o \
+        -name htmlcov -o \
+        -name package-lock.json -o \
+        -name dist -o \
+        -name dbt_packages -o \
+        -name dbt.log \
+        \) -prune -o -type f -exec /usr/bin/grep -I -n "$i_flag" "$search" {} \+
+}
+alias ss='_source_search'
+
+# Show programs which have data in the swap space
+_show_swapped(){
+    printf '%-40s%8s%-20s%10s\n' Name PID ' ' Swapped
+    for f in /proc/*/status; do
+        awk '/^VmSwap:/{printf "%10s", $2$3} /^Name:/{printf "%-40s", $2} /^Pid:/{printf "%8s%-20s", $2, ""} END{print ""}' "$f" 2>/dev/null
+    done \
+        | awk '$3 != "" && $3 != "0kB"' \
+        | sort -n -k3
+}
+alias show-swapped=_show_swapped
+
+# Read CloudWatch log stream
+_aws_read_log(){
+    if [ $# -ne 3 ]; then
+        echo 'aws-read-log [PROFILE] [LOG_GROUP] [LOG_STREAM]' >&2 ; return 2
+    fi
+    PROFILE="${1:-default}"
+    LOG_GROUP="$2"
+    LOG_STREAM="$3"
+    set -x
+    # shellcheck disable=SC3001
+    nvim <(aws logs get-log-events \
+        --profile "$PROFILE" \
+        --log-group-name "$LOG_GROUP" \
+        --log-stream-name "$LOG_STREAM" \
+        --start-from-head \
+        | jq -r '.events[].message')
+}
+alias aws-read-log=_aws_read_log
+
+
+_aws_assume_role(){
+    OUT="$(aws sts assume-role --role-arn "$1" --role-session-name "${USER}-$(date +%Y%m%d)" --query Credentials)"
+    AccessKeyId="$(echo "$OUT" | jq -r .AccessKeyId)"
+    SecretAccessKey="$(echo "$OUT" | jq -r .SecretAccessKey)"
+    SessionToken="$(echo "$OUT" | jq -r .SessionToken)"
+    export AWS_ACCESS_KEY_ID="$AccessKeyId"
+    export AWS_SECRET_ACCESS_KEY="$SecretAccessKey"
+    export AWS_SESSION_TOKEN="$SessionToken"
+}
+alias assume-role=_aws_assume_role
+
+_aws_discard_role(){
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    unset AWS_SESSION_TOKEN
+}
+alias discard-role=_aws_discard_role
+
+
+#alias gocat='while true; do cat ~/.config/zsh/meow.txt; done'
+#alias morecats=gocats
+
+cats(){
+    n=0
+    while [ "$1" = "forever" ] || [ "$n" -lt "$1" ]; do
+        n="$(( n + 1))"
+        cat ~/.config/zsh/meow.txt
+    done
+}
+
+dog(){
+    cat ~/.config/zsh/woof2.txt
+}
+dogs(){
+    n=0
+    while [ "$1" = "forever" ] || [ "$n" -lt "$1" ]; do
+        n="$(( n + 1))"
+        cat ~/.config/zsh/woof2.txt
+    done
+}
+
+
+# --------------------------------------
+# DAS
+# --------------------------------------
+alias cloudwatch-etl-octopod='saw watch /aws/elasticbeanstalk/das-etl-octopod/var/log/eb-docker/containers/eb-current-app/stdouterr.log'

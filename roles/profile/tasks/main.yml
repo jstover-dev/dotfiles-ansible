@@ -1,0 +1,11 @@
+- name: Install .profile
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', 'profile') | path_join }}"
+    dest: "{{ (ansible_env.HOME, '.profile') | path_join }}"
+    state: link
+
+- name: Install .aliases
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', 'aliases') | path_join }}"
+    dest: "{{ (ansible_env.HOME, '.aliases') | path_join }}"
+    state: link

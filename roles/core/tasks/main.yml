@@ -1,0 +1,16 @@
+- name: "Install packages"
+  ansible.builtin.package:
+    state: present
+    name:
+      - aria2
+      - bash
+      - curl
+      - direnv
+      - fzf
+      - mercurial
+      - powerline
+      - ripgrep
+      - rsync
+      - wget
+      - wl-clipboard
+      - xclip

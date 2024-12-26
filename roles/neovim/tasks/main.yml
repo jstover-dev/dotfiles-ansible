@@ -1,0 +1,46 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name: neovim
+    state: present
+
+- name: "Calculate paths"
+  ansible.builtin.set_fact:
+    conf_path: "{{ (xdg_config_home, 'nvim') | path_join }}"
+
+- name: "Create config path"
+  ansible.builtin.file:
+    path: "{{ conf_path }}"
+    state: directory
+    mode: '0755'
+
+- name: "Locate files"
+  register: files
+  ansible.builtin.find:
+    paths: "{{ (role_path, 'files') | path_join }}"
+    file_type: file
+    get_checksum: true
+
+- name: "Link files"
+  loop: "{{ files.files }}"
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ (conf_path, (item.path | basename)) | path_join }}"
+    state: link
+
+- name: "Setup Python virtualenv"
+  ansible.builtin.pip:
+    virtualenv_command: "python3 -m venv"
+    virtualenv: "{{ (ansible_env.HOME, '.envs', 'nvim') | path_join }}"
+    extra_args: --upgrade
+    name:
+      - pip
+      - pynvim
+      - jedi
+
+- name: "Update checksums"
+  notify: UpdateNeovimPlugins
+  ansible.builtin.copy:
+    dest: "{{ (conf_path, 'anisble.sha1') | path_join }}"
+    content: "{% for file in files.files %}{{ file.checksum }}  {{ file.path | basename }}\n{% endfor %}"
+    mode: '0644'

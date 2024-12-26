@@ -1,0 +1,5 @@
+# Skip global (/etc/zsh*) configuration files
+unsetopt GLOBAL_RCS
+
+ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config/}/zsh"
+

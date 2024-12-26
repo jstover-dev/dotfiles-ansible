@@ -1,0 +1,9 @@
+- name: "Determine package name"
+  ansible.builtin.set_fact:
+    packages: "{{ python_packages[ansible_distribution] | default(python_packages['default']) }}"
+
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name: "{{ packages }}"
+    state: present

@@ -1,0 +1,8 @@
+python_packages:
+  default:
+    - python
+    - python-setuptools
+  Debian:
+    - python3
+    - python3-setuptools
+    - python3-venv

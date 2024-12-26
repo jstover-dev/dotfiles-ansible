@@ -1,0 +1,11 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: ".gitconfig"
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', 'gitconfig') | path_join }}"
+    dest: "{{ (ansible_env.HOME, '.gitconfig') | path_join }}"
+    state: link
