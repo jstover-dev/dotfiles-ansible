@@ -1,1 +1,8 @@
+git_name: lucy
+git_email: lucy@example.com
+git_signingkey: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+mercurial_name: lucy
+mercurial_email: lucy@example.com
+
 aria2_rpc_secret: supersecret
