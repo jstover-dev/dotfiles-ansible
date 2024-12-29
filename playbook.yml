@@ -18,3 +18,15 @@
     - python
     - neovim
     - aria2
+    - direnv
+    - docker
+    - mc
+    - pacman
+    - tmux
+    - xmonad
+    - starship
+    - konsole
+    - git
+    - mercurial
+    - mutt
+    - kitty

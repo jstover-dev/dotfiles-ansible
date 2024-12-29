@@ -1,0 +1,91 @@
+Config { font = "MesloLGS NF 14"
+       , additionalFonts = [ "MesloLGS NF Italic 14"
+                           , "Font Awesome 6 Free 14"
+                           , "Font Awesome 6 Free 16"
+                           ]
+       , borderColor = "black"
+       , border = FullB
+       , bgColor = "black"
+       , fgColor = "grey"
+       , alpha = 128
+       , position = BottomSize L 100 50
+
+       , lowerOnStart = True
+       , textOutputFormat = Ansi
+
+       , commands = [ Run Com "uname" ["-s","-r"] "" 36000
+
+                    , Run Network "enp2s0" [ "--template", "<fn=2>\xf080</fn> <dev>: <rx> <tx>"
+                                           , "-L", "0"
+                                           , "-H", "4096"
+                                           , "-S", "True"
+                                           , "--normal", "white"
+                                           , "--high", "white"
+                                           ] 10
+
+                    , Run Weather "YBCS"   [ "--template", "<fn=2>\xf0c2</fn> <tempC>C"
+                                           , "-L", "18"
+                                           , "-H", "29"
+                                           , "--normal", "lightgreen"
+                                           , "--high", "red"
+                                           , "--low", "lightblue"
+                                           ] 36000
+
+                    , Run CoreTemp         [ "--template" , "<fn=2>\xf2c9</fn> <core0>C"
+                                           , "--Low"      , "70"        -- units: C
+                                           , "--High"     , "80"        -- units: C
+                                           , "--low"      , "lightgreen"
+                                           , "--normal"   , "orange"
+                                           , "--high"     , "red"
+                                           , "-m", "3"
+                                           ] 50
+
+                    , Run Cpu              [ "--template", "<fn=2>\xf2db</fn> <total>%"
+                                           , "-L", "3"
+                                           , "-H", "50"
+                                           , "-m", "3"
+                                           , "--normal", "lightgreen"
+                                           , "--high", "red"
+                                           ] 10
+
+                    , Run Memory           [ "--template", "<fn=2>\xf538</fn> <usedratio>%"
+                                           , "-m", "3"
+                                           ] 10
+
+                    , Run Swap             [ "--template", "<fn=2>\xf079</fn> <usedratio>%"
+                                           , "-m", "3"
+                                           ] 10
+
+                    , Run DiskU            [ ("/", "<fn=2>\xf1c0</fn> <used>/<size>")
+                                           ]
+                                           [ "-L", "20"
+                                           , "-H", "50"
+                                           , "-m", "1"
+                                           , "-p", "3"
+                                           ] 20
+
+                    , Run Date "%d/%m/%Y %H:%M:%S" "date" 10
+
+
+                    -- The printf/perl commands don't seem to work when xmobar is started with XMonad, so misuse BatteryN instead.
+                    -- Likely a skill issue...
+                    --, Run Com "printf" ["<fn=3>\xf225</fn>"] "center_icon" 864000
+                    --, Run Com "perl" ["-C", "-e", "print chr 0x250a"] "sep" 864000
+
+                    , Run BatteryN          ["BAT0"] [ "--template", "<fn=3>\xf225</fn>" ] 864000 "center_icon"
+                    , Run BatteryN          ["BAT0"] [ "--template", "<fn=0> \x250a </fn>" ] 864000 "sep"
+
+                    , Run XMonadLog
+
+                    ]
+
+
+       , sepChar = "%"
+       , alignSep = "}{"
+
+       , template = " %cpu% %sep% %memory% %sep% %swap% %sep% %coretemp% %sep% %disku% %sep% %enp2s0% } \
+                    \%center_icon% \
+                    \{ %XMonadLog% %sep% %YBCS% %sep% <fc=#ee9a00><fn=0>%date%</fn></fc> "
+
+
+       }

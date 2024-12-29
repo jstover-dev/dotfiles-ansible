@@ -1,0 +1,39 @@
+#colours
+source $XDG_CONFIG_HOME/mutt/colours/solarized-light-256.muttrc
+
+# index/pager split
+set pager_index_lines = 20
+
+# vim-like tilde padding
+set tilde
+
+# wrap on word boundaries
+set smart_wrap
+
+# enable threads
+set sort = 'threads'
+set sort_aux = 'reverse-last-date-received'
+
+# prefer plain text over HTML
+alternative_order text/plain text/html
+
+# view HTML in lynx
+set mailcap_path = $XDG_CONFIG_HOME/mutt/mailcap
+auto_view text/html
+
+# speed up folder switching
+set sleep_time = 0
+
+# mail checking options
+set mail_check=15
+set timeout=30
+
+# compose/reply options
+set editor=nvim
+ignore headers *
+unignore headers from to subject date cc
+hdr_order from to cc subject date
+set fast_reply      # dont ask for 'to' or 'subject' when replying
+unset metoo         # remove self from replies
+set include=yes     # quote when replying
+set sort=date-received

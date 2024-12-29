@@ -3,8 +3,11 @@
 [commit]
 	gpgSign = true
 
+[tag]
+    gpgSign = true
+
 [include]
-    path = .gitconfig.user
+    path = config.user
 
 [merge]
 	tool = kdiff3
@@ -26,7 +29,7 @@
 [core]
 #   pager = less -F -X
     pager = delta
-    excludesfile = ~/.gitignore
+#    excludesfile = ~/.gitignore
     sharedRepository = 0664
 
 [submodule]

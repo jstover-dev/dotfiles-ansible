@@ -1,0 +1,7 @@
+- name: "Install yay-news.hook"
+  become: true
+  when: ansible_distribution == 'Archlinux'
+  ansible.builtin.copy:
+    src: "{{ (role_path, 'files', '00-yay-news.hook') | path_join }}"
+    dest: "/etc/pacman.d/hooks/00-yay-news.hook"
+    mode: '0644'

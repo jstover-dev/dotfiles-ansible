@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = *
+Target = !yay
+
+[Action]
+Description = Checking Arch News with yay ...
+When = PreTransaction
+Exec = /usr/bin/sudo -u nobody -g nobody /usr/bin/yay -Pw
+

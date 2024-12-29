@@ -18,12 +18,12 @@ call plug#begin('~/.local/share/nvim/plugged')
     Plug 'PProvost/vim-ps1'
     Plug 'Shougo/echodoc'
 "    Plug 'alpertuna/vim-header'
-    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
+"    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 "    Plug 'neomake/neomake'
     Plug 'dag/vim-fish'
     Plug 'OmniSharp/omnisharp-vim'
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'pappasam/coc-jedi', { 'do': 'yarn install --frozen-lockfile && yarn build', 'branch': 'main' }
+"    Plug 'pappasam/coc-jedi', { 'do': 'yarn install --frozen-lockfile && yarn build', 'branch': 'main' }
     Plug 'josa42/coc-sh'
     Plug 'alvan/vim-closetag'
     Plug 'cespare/vim-toml'
@@ -35,7 +35,6 @@ call plug#end()
 " MacOS leader key defaults suck shit
 let mapleader = ','
 
-
 " Open/close folds with space bar
 nnoremap <space> za
 vnoremap <space> zf
@@ -44,7 +43,6 @@ set t_te=
 set t_ti=
 
 let g:coc_global_extensions = ['coc-jedi', 'coc-yaml', 'coc-sh']
-
 
 " Paths
 let g:coc_node_path = "$XDG_DATA_HOME/asdf/shims/node"

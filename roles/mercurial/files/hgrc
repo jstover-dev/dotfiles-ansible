@@ -1,0 +1,13 @@
+%include hgrc.user
+
+[ui]
+tweakdefaults = True
+paginate = never
+interface = curses
+
+[extensions]
+hgext.convert =
+hgext.extdiff =
+
+[extdiff]
+cmd.kdiff3 =

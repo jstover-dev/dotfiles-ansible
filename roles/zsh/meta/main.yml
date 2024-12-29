@@ -1,3 +1,4 @@
 dependencies:
   - role: profile
   - role: fonts
+  - role: starship

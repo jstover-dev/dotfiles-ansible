@@ -1,0 +1,46 @@
+# Mercurial
+.hg/
+.hgignore
+
+# Python dev files
+__pycache__/
+venv/
+.venv/
+*.pyc
+htmlcov/
+.coverage
+
+# JetBrains
+.idea/
+*.iml
+
+# vim
+.vim/
+
+# Direnv
+.direnv/
+.envrc
+
+# Geo
+*.gpkg
+*.shp
+*.tif.aux.xml
+
+# Diff
+*.orig
+
+# mprofile data
+mprofile_*.dat
+
+# Node
+node_modules/
+
+# AWS SAM
+.aws-sam/
+
+# Dask
+dask-worker-space/
+
+# Misc
+.run/
+dist/

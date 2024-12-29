@@ -1,0 +1,19 @@
+- name: Install
+  become: true
+  ansible.builtin.package:
+    name: kitty
+    state: present
+
+- name: Sync kitty-themes
+  ansible.builtin.git:
+    repo: https://github.com/dexpota/kitty-themes.git
+    dest: "{{ (role_path, 'files', 'kitty-themes') | path_join }}"
+    version: master
+    depth: 1
+    accept_newhostkey: true
+
+- name: Link configuration
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files') | path_join }}"
+    dest: "{{ (xdg_config_home, 'kitty') | path_join }}"
+    state: link

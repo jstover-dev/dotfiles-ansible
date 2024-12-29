@@ -69,6 +69,9 @@ fi
 # ipython = ipython3
 if command -v ipython3 >/dev/null; then alias ipython='ipython3'; fi
 
+# mutt = neomutt
+if command -v neomutt >/dev/null; then alias mutt=neomutt; fi
+
 
 # ----------------------------------------------------------------------------
 # Shortcuts and options
@@ -112,9 +115,6 @@ alias freyr='docker run --user=$(id -u):$(id -g) -it --rm -v $PWD:/data freyrcli
 # ----------------------------------------------------------------------------
 # Fixes
 # ----------------------------------------------------------------------------
-
-# mutt does not recognise the HOSTNAME environment variable
-alias mutt='HOSTNAME=$(uname -n) MUTT=$(command -pv mutt 2>/dev/null || command -pv neomutt 2>/dev/null) $MUTT'
 
 # search is useless if it scans the entire description ffs
 apt() {

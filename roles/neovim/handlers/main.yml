@@ -1,3 +1,3 @@
 - name: UpdateNeovimPlugins
-  ansible.builtin.command: "echo UpdateNeovimPlugins..."
+  ansible.builtin.command: "{{ (role_path, 'handlers', 'PlugInstall.sh') | path_join }}"
   changed_when: false
