@@ -1,7 +1,9 @@
+TAGS ?= all
+
 .PHONY: init install verbose
 
 install: init
-	ansible-playbook --ask-become-pass --vault-password-file .vault-password playbook.yml
+	ansible-playbook --ask-become-pass --vault-password-file .vault-password --tags "$(TAGS)" playbook.yml
 
 verbose: init
 	ansible-playbook -vv --ask-become-pass --vault-password-file .vault-password playbook.yml

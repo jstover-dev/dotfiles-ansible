@@ -10,7 +10,8 @@
     XDG_DATA_HOME: "{{ xdg_data_home }}"
 
   roles:
-    - core
+    - role: core
+      tags: ['core']
     - profile
     - fonts
     - zsh
