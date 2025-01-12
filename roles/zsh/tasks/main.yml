@@ -1,7 +1,10 @@
 - name: "Install"
   become: true
   ansible.builtin.package:
-    name: zsh
+    name:
+      - zsh
+      - fzf
+
     state: present
 
 - name: "Calculate paths"

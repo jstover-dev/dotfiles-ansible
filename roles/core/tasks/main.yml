@@ -3,14 +3,12 @@
   ansible.builtin.package:
     state: present
     name:
-      - aria2
       - bash
       - borg
       - curl
       - direnv
-      - fzf
-      - mercurial
       - powerline
+      - filelight
       - ripgrep
       - rsync
       - wget
