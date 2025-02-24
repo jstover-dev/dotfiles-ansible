@@ -84,6 +84,9 @@ path_prepend "$HOME/bin"
 path_prepend "$HOME/.local/bin"
 path_prepend /scripts
 
+# asdf shims
+path_prepend "${ASDF_DATA_DIR}/shims"
+
 # Go
 path_append "${GOPATH}/bin"
 
