@@ -85,7 +85,7 @@ path_prepend "$HOME/.local/bin"
 path_prepend /scripts
 
 # Go
-path_append "${XDG_DATA_DIR}/go/bin"
+path_append "${GOPATH}/bin"
 
 # Terraform
 path_append "$HOME/.tfenv/bin"
