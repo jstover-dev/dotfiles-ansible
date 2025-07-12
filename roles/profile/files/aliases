@@ -246,6 +246,17 @@ _git_deploy(){
 }
 alias git-deploy=_git_deploy
 
+_git_reset_author(){
+    NAME="$(git config get user.name)"
+    EMAIL="$(git config get user.email)"
+    echo "WARNING: This will rewrite the author field for ALL commits in the repository!"
+    echo "Author: ${NAME} <${EMAIL}>"
+    if yesno "Are you sure you want to rewrite history like this?"; then
+        git filter-branch -f --env-filter "GIT_AUTHOR_NAME='${NAME}';GIT_AUTHOR_EMAIL='${EMAIL}';GIT_COMMITTER_NAME='${NAME}';GIT_COMMITTER_EMAIL='${EMAIL}'" HEAD
+    fi
+}
+alias git-reset-author=_git_reset_author
+
 # Convert geospatial file to GPKG
 gpkg() { ogr2ogr -nlt MultiPolygon -progress "$1.gpkg" "$1"; }
 
