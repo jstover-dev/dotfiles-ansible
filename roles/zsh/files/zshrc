@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
-# If ZDOTFILES is undefined, assume plugins etc are in ~/.zsh
-ZSH_DATA="${ZDOTFILES:-$HOME/.zsh}"
+# If ZDOTDIR is undefined, assume plugins etc are in ~/.zsh
+ZSH_DATA="${ZDOTDIR:-$HOME/.zsh}"
 
 # use common posix rc files
 if [ -e "${HOME}/.profile" ]; then
@@ -19,7 +19,7 @@ function _source(){
 
 #setopt correct                              # Auto correct mistakes
 setopt extendedglob                         # Extended globbing. Allows using regular expressions with *
-setopt nocaseglob                           # Case insensitive globbing
+#setopt nocaseglob                           # Case insensitive globbing
 setopt rcexpandparam                        # Array expension with parameters
 setopt nocheckjobs                          # Don't warn about running processes when exiting
 setopt numericglobsort                      # Sort filenames numerically when it makes sense
@@ -39,10 +39,10 @@ setopt SH_NULLCMD                           # Do not use the values of NULLCMD a
 export LS_COLORS=$LS_COLORS:'ow=1;34:'
 
 
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}'  # match uppercase during tab complete 
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}'  # match uppercase during tab complete
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"             # Colored completion (different colors for dirs/files/etc)
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
-zstyle ':completion:*' rehash true                                  # automatically find new executables in path 
+zstyle ':completion:*' rehash true                                  # automatically find new executables in path
 
 # Need to double check what these do
 zstyle ':completion:*' squeeze-slashes true
@@ -146,7 +146,7 @@ fi
 # fzf-tab
 _source "${ZSH_DATA}/plugins/fzf-tab/fzf-tab.plugin.zsh"
 
-# Try load z.lua 
+# Try load z.lua
 if [ -f "$HOME/.local/bin/z.lua" ]; then
     xdg_state="${XDG_STATE_HOME:=$HOME/.local/state}"
     if [ ! -f "${xdg_state}" ]; then mkdir -p "${xdg_state}"; fi
@@ -204,7 +204,7 @@ cat "${ZDOTDIR:-${HOME}/.zsh}/meow.txt"
 #        0)  /scripts/kittysay.py | tte slide --movement-speed 1 --final-gradient-steps 10 --final-gradient-frames 1 ;;
 #        1)  /scripts/kittysay.py | tte scattered --movement-speed 1 --final-gradient-steps 10 --final-gradient-frames 1 ;;
 #    esac
-#        
+#
 #else
 #    /scripts/kittysay.py
 #fi
