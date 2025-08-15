@@ -257,6 +257,16 @@ _git_reset_author(){
 }
 alias git-reset-author=_git_reset_author
 
+# Automatically give user write permission to all git objects
+alias __git="$(command which git)"
+git(){
+    __git "$@";
+    DOTGIT="$(__git rev-parse --show-toplevel)"
+    if [ "$?" -ne 0 ]; then return; fi
+    find "${DOTGIT}/.git/objects" -type f -exec chmod u+w {} \+
+}
+
+
 # Convert geospatial file to GPKG
 gpkg() { ogr2ogr -nlt MultiPolygon -progress "$1.gpkg" "$1"; }
 
@@ -394,3 +404,4 @@ dogs(){
 # DAS
 # --------------------------------------
 alias cloudwatch-etl-octopod='saw watch /aws/elasticbeanstalk/das-etl-octopod/var/log/eb-docker/containers/eb-current-app/stdouterr.log'
+
