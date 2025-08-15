@@ -197,3 +197,6 @@ export MAKEFLAGS="-j$cores"
 # Use docker BuildKit
 export DOCKER_BUILDKIT=1
 
+# SSH agent socket
+export SSH_AUTH_SOCK="$HOME/.ssh/ssh_auth_sock"
+
