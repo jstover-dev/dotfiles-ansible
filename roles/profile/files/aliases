@@ -405,3 +405,17 @@ dogs(){
 # --------------------------------------
 alias cloudwatch-etl-octopod='saw watch /aws/elasticbeanstalk/das-etl-octopod/var/log/eb-docker/containers/eb-current-app/stdouterr.log'
 
+
+
+_docker_image2tar(){
+    if [ ! "$#" -eq 2 ]; then
+        echo "$0 [IMAGE] [FILE]"
+        echo "Export a docker image to tar file"
+        return
+    fi
+    containerId="$(docker create "$1")"
+    docker export "${containerId}" > "$2"
+    docker rm "${containerId}" >/dev/null
+}
+alias docker-image2tar='_docker_image2tar'
+
