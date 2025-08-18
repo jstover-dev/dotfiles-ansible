@@ -1,11 +1,2 @@
-- name: "Install"
-  become: true
-  ansible.builtin.package:
-    name: mutt
-    state: present
-
-- name: "Link Configuration"
-  ansible.builtin.file:
-    src: "{{ (role_path, 'files') | path_join }}"
-    dest: "{{ (xdg_config_home, 'mutt') | path_join }}"
-    state: link
+- import_tasks: tasks.yml
+  tags: [ mutt ]

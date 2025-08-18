@@ -1,0 +1,33 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name:
+      - git
+      - git-delta
+      - kdiff3
+    state: present
+
+- name: "Calculate paths"
+  ansible.builtin.set_fact:
+    conf_path: "{{ (xdg_config_home, 'git') | path_join }}"
+
+- name: "Create config path"
+  ansible.builtin.file:
+    path: "{{ conf_path }}"
+    state: directory
+    mode: '0755'
+
+- name: "Link files"
+  loop:
+    - config
+    - ignore
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', item) | path_join }}"
+    dest: "{{ (conf_path, item) | path_join }}"
+    state: link
+
+- name: "Generate user-specific config"
+  ansible.builtin.template:
+    src: "{{ (role_path, 'templates', 'config.user.j2') | path_join }}"
+    dest: "{{ (conf_path, 'config.user') | path_join }}"
+    mode: "0600"

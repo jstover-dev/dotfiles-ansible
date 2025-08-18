@@ -1,6 +1,2 @@
-- name: "Install"
-  ansible.builtin.git:
-    repo: https://github.com/asdf-vm/asdf.git
-    dest: "{{ (xdg_data_home, 'asdf') | path_join }}"
-    version: "v0.15.0"
-    accept_newhostkey: true
+- import_tasks: tasks.yml
+  tags: [ asdf ]

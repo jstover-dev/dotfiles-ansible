@@ -1,0 +1,29 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name:
+      - mercurial
+      - kdiff3
+    state: present
+
+- name: "Calculate paths"
+  ansible.builtin.set_fact:
+    conf_path: "{{ (xdg_config_home, 'hg') | path_join }}"
+
+- name: "Create config path"
+  ansible.builtin.file:
+    path: "{{ conf_path }}"
+    state: directory
+    mode: '0755'
+
+- name: "Link files"
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', 'hgrc') | path_join }}"
+    dest: "{{ (conf_path, 'hgrc') | path_join }}"
+    state: link
+
+- name: "Generate user-specific config"
+  ansible.builtin.template:
+    src: "{{ (role_path, 'templates', 'hgrc.user.j2') | path_join }}"
+    dest: "{{ (conf_path, 'hgrc.user') | path_join }}"
+    mode: "0600"

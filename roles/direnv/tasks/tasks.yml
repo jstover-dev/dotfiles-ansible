@@ -1,0 +1,24 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name: direnv
+    state: present
+
+- name: "Calculate paths"
+  ansible.builtin.set_fact:
+    conf_path: "{{ (xdg_config_home, 'direnv') | path_join }}"
+
+- name: "Create config path"
+  ansible.builtin.file:
+    path: "{{ conf_path }}"
+    state: directory
+    mode: '0755'
+
+- name: "Link files"
+  loop:
+    - "direnvrc"
+    - "direnv.toml"
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', item) | path_join }}"
+    dest: "{{ (conf_path, item) | path_join }}"
+    state: link

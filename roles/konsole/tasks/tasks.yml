@@ -1,0 +1,5 @@
+- name: Link config
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files') | path_join }}"
+    dest: "{{ (xdg_data_home, 'konsole') | path_join }}"
+    state: link

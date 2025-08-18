@@ -1,18 +1,2 @@
-- name: Install .profile
-  ansible.builtin.file:
-    src: "{{ (role_path, 'files', 'profile') | path_join }}"
-    dest: "{{ (ansible_env.HOME, '.profile') | path_join }}"
-    state: link
-
-- name: Install .profile (plasma)
-  ansible.builtin.file:
-    src: "{{ (role_path, 'files', 'profile') | path_join }}"
-    dest: "{{ (xdg_config_home, 'plasma-workspace', 'env', 'profile.sh') | path_join }}"
-    state: link
-
-
-- name: Install .aliases
-  ansible.builtin.file:
-    src: "{{ (role_path, 'files', 'aliases') | path_join }}"
-    dest: "{{ (ansible_env.HOME, '.aliases') | path_join }}"
-    state: link
+- import_tasks: tasks.yml
+  tags: [ profile ]

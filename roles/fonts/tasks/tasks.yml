@@ -1,0 +1,19 @@
+- name: "[fonts] Create fonts directory"
+  ansible.builtin.file:
+    path: "{{ fonts_fontdir }}"
+    state: directory
+    mode: '0755'
+
+- name: "[fonts] Locate font files"
+  register: fonts
+  ansible.builtin.find:
+    paths: "{{ (role_path, 'files') | path_join }}"
+    file_type: file
+
+- name: "[fonts] Install"
+  loop: "{{ fonts.files }}"
+  notify: UpdateFontCache
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ (fonts_fontdir, (item.path | basename | urldecode)) | path_join }}"
+    state: link

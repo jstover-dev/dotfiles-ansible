@@ -1,0 +1,28 @@
+- name: Calculate paths
+  ansible.builtin.set_fact:
+    tarfile: "{{ (role_path, 'files', 'starship.tar.gz') | path_join }}"
+    local_bin: "{{ (ansible_env.HOME, '.local', 'bin') | path_join }}"
+
+
+- name: Create ~/.local/bin
+  ansible.builtin.file:
+    path: "{{ local_bin }}"
+    state: directory
+    mode: '0755'
+
+- name: Download
+  ansible.builtin.get_url:
+    url: "https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz"
+    dest: "{{ tarfile }}"
+    mode: '0644'
+
+- name: Extract
+  ansible.builtin.unarchive:
+    src: "{{ tarfile }}"
+    dest: "{{ local_bin }}"
+
+- name: Link config
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', 'starship.toml') | path_join }}"
+    dest: "{{ (xdg_config_home, 'starship.toml') | path_join }}"
+    state: link

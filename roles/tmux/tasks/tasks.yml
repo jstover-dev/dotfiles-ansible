@@ -1,0 +1,11 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name: tmux
+    state: present
+
+- name: "Link config path"
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files') | path_join }}"
+    dest: "{{ (xdg_config_home, 'tmux') | path_join }}"
+    state: link

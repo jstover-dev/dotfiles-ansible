@@ -1,21 +1,2 @@
-- name: "Install"
-  become: true
-  ansible.builtin.package:
-    name: aria2
-    state: present
-
-- name: "Calculate paths"
-  ansible.builtin.set_fact:
-    conf_path: "{{ (xdg_config_home, 'aria2') | path_join }}"
-
-- name: "Create config path"
-  ansible.builtin.file:
-    path: "{{ conf_path }}"
-    state: directory
-    mode: '0755'
-
-- name: "Copy Configuration"
-  ansible.builtin.template:
-    src: "{{ (role_path, 'templates', 'aria2.conf.j2') | path_join }}"
-    dest: "{{ (conf_path, 'aria2.conf') | path_join }}"
-    mode: '0600'
+- import_tasks: tasks.yml
+  tags: [ aria2 ]

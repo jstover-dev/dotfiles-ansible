@@ -1,8 +1,8 @@
 TAGS ?= all
 
-.PHONY: init install verbose
+.PHONY: init apply-all verbose
 
-install: init
+apply-all: init
 	ansible-playbook --ask-become-pass --vault-password-file .vault-password --tags "$(TAGS)" playbook.yml
 
 verbose: init
@@ -15,4 +15,9 @@ init: .vault-password group_vars/all/vault
 
 group_vars/all/vault:
 	$(error "Vault is missing (group_vars/all/vault). Create file containing vault entries continue")
+
+
+REPO := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+install: $(REPO)installer/main.go
+	go build -C "$(REPO)installer" -o "$(REPO)install"
 

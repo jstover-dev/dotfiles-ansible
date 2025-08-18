@@ -1,15 +1,2 @@
-- name: "Create hooks directory"
-  become: true
-  when: ansible_distribution =='Archlinux'
-  ansible.builtin.file:
-    path: "/etc/pacman.d/hooks"
-    state: directory
-    mode: '0755'
-
-- name: "Install yay-news.hook"
-  become: true
-  when: ansible_distribution =='Archlinux'
-  ansible.builtin.copy:
-    src: "{{ (role_path, 'files', '00-yay-news.hook') | path_join }}"
-    dest: "/etc/pacman.d/hooks/00-yay-news.hook"
-    mode: '0644'
+- import_tasks: tasks.yml
+  tags: [ pacman ]
