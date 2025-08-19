@@ -2,13 +2,12 @@ package ui
 
 import (
 	"fmt"
-	"os"
+	"slices"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"gopkg.in/yaml.v3"
 )
 
 type ansibleRole struct {
@@ -25,36 +24,18 @@ type Model struct {
 	all_value bool
 }
 
-func readPlaybookRoles(playbookFile string) ([]ansibleRole, error) {
-	roles := []ansibleRole{}
-	p := make([]struct{ Roles []string }, 1)
-	buf, err := os.ReadFile(playbookFile)
-	if err != nil {
-		return roles, err
-	}
-	err = yaml.Unmarshal(buf, &p)
-	if err != nil {
-		return roles, fmt.Errorf("in file %q: %w", playbookFile, err)
-	}
-	for _, name := range p[0].Roles {
-		roles = append(roles, ansibleRole{name: name})
-	}
-	return roles, nil
-}
-
-func NewModel(playbookFile string) (Model, error) {
+func NewModel(roles []string, selectedRoles []string) Model {
 	m := Model{
 		help:   help.New(),
 		keymap: newKeyMap(),
 		roles:  []ansibleRole{},
 		cursor: 0,
 	}
-	roles, err := readPlaybookRoles(playbookFile)
-	if err != nil {
-		return m, err
+	for _, name := range roles {
+		role := ansibleRole{name: name, enabled: slices.Contains(selectedRoles, name)}
+		m.roles = append(m.roles, role)
 	}
-	m.roles = roles
-	return m, nil
+	return m
 }
 
 func (m Model) Init() tea.Cmd {
