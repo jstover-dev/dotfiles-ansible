@@ -163,7 +163,7 @@ func main() {
 
 		m = tm.(ui.Model)
 		if m.Cancelled {
-			fmt.Println("Installation cancelled,")
+			fmt.Println("Installation cancelled")
 			os.Exit(ERROR_CANCELLED)
 		}
 
