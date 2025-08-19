@@ -81,40 +81,46 @@ func readPlaybookRoles(path string) ([]string, error) {
 	return roles, nil
 }
 
-func Usage() {
+func Usage(knownRoles []string) {
+	rolesHelp := ""
+	for _, r := range knownRoles {
+		rolesHelp += " [" + r + "]"
+	}
 	usage := `
-Usage: %s [OPTION]... [ROLE]...
+Usage: %s [OPTION]...%s
 
 Options:
-    -i, --interactive \t       Start interactive mode
+        -h, --help             Show this help screen
+        -i, --interactive      Start interactive mode
 `
-	fmt.Printf(usage, path.Base(os.Args[0]))
+	fmt.Printf(usage, path.Base(os.Args[0]), rolesHelp)
 }
 
 type programArgs struct {
 	interactive bool
+	help        bool
 	selectRoles []string
 }
 
-func parseArgs() programArgs {
+func parseArgs(knownRoles []string) programArgs {
 	a := programArgs{}
-	if len(os.Args) == 1 {
-		Usage()
-		os.Exit(ERROR_INVALID_ARGUMENTS)
-	}
 	for _, arg := range os.Args[1:] {
 		if arg == "-i" || arg == "--interactive" {
 			a.interactive = true
-		} else {
-			a.selectRoles = append(a.selectRoles, arg)
+			continue
+		} else if arg == "-h" || arg == "--help" {
+			a.help = true
+			continue
 		}
+		if !slices.Contains(knownRoles, arg) {
+			fmt.Printf("Warning: %s is not a valid role name", arg)
+		}
+		a.selectRoles = append(a.selectRoles, arg)
 	}
 	return a
 }
 
 func main() {
-
-	args := parseArgs()
 
 	playbookRoot, err := findPlaybookRoot()
 	if err != nil {
@@ -129,12 +135,21 @@ func main() {
 		os.Exit(ERROR_INVALID_PLAYBOOK)
 	}
 
+	if len(os.Args) == 1 {
+		Usage(roleNames)
+		os.Exit(ERROR_INVALID_ARGUMENTS)
+	}
+
+	args := parseArgs(roleNames)
+	if args.help {
+		Usage(roleNames)
+		os.Exit(0)
+	}
+
 	enabledRoles := []string{}
 	for _, role := range args.selectRoles {
 		if slices.Contains(roleNames, role) {
 			enabledRoles = append(enabledRoles, role)
-		} else {
-			fmt.Printf("Warning: %s is not a valid role name", role)
 		}
 	}
 
