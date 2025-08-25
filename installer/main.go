@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"os/exec"
 	"path"
@@ -15,20 +16,24 @@ import (
 )
 
 const (
-	ERROR_INVALID_ARGUMENTS = 1
-	ERROR_MISSING_PLAYBOOK  = 2
-	ERROR_INVALID_PLAYBOOK  = 3
-	ERROR_STARTING_UI       = 4
-	ERROR_CANCELLED         = 5
-	ERROR_NO_ROLES_SELECTED = 6
-	ERROR_RUNNING_ANSIBLE   = 7
+	EXIT_OK = iota
+	ERROR_INVALID_ARGUMENTS
+	ERROR_MISSING_PLAYBOOK
+	ERROR_INVALID_PLAYBOOK
+	ERROR_INVALID_HOSTSFILE
+	ERROR_STARTING_UI
+	ERROR_CANCELLED
+	ERROR_NO_ROLES_SELECTED
+	ERROR_NO_HOSTS_SELECTED
+	ERROR_RUNNING_ANSIBLE
 )
 
-func runAnsible(dir string, enabledRoles []string) error {
+func runAnsible(dir string, selectedRoles []string, selectedHosts []string) error {
 	argv := []string{
 		"--ask-become-pass",
 		"--vault-password-file", ".vault-password",
-		"--tags", strings.Join(enabledRoles, ","),
+		"--tags", strings.Join(selectedRoles, ","),
+		"--limit", strings.Join(selectedHosts, ","),
 		"playbook.yml",
 	}
 	cmd := exec.Command("ansible-playbook", argv...)
@@ -81,6 +86,28 @@ func readPlaybookRoles(path string) ([]string, error) {
 	return roles, nil
 }
 
+type HostsFile struct {
+	All struct {
+		Hosts map[string]struct{}
+	}
+}
+
+func readHosts(path string) ([]string, error) {
+	hosts := []string{}
+	obj := struct {
+		All struct{ Hosts map[string]struct{} }
+	}{}
+	buf, err := os.ReadFile(path)
+	if err != nil {
+		return hosts, err
+	}
+	err = yaml.Unmarshal(buf, &obj)
+	if err != nil {
+		return hosts, err
+	}
+	return slices.Collect(maps.Keys(obj.All.Hosts)), nil
+}
+
 func Usage(knownRoles []string) {
 	rolesHelp := ""
 	for _, r := range knownRoles {
@@ -127,12 +154,19 @@ func main() {
 		fmt.Printf("Error: %v", err)
 		os.Exit(ERROR_MISSING_PLAYBOOK)
 	}
-	playbookFile := path.Join(playbookRoot, "playbook.yml")
 
+	playbookFile := path.Join(playbookRoot, "playbook.yml")
 	roleNames, err := readPlaybookRoles(playbookFile)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		os.Exit(ERROR_INVALID_PLAYBOOK)
+	}
+
+	hostsFile := path.Join(playbookRoot, "hosts.yml")
+	hosts, err := readHosts(hostsFile)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		os.Exit(ERROR_INVALID_HOSTSFILE)
 	}
 
 	if len(os.Args) == 1 {
@@ -146,15 +180,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	enabledRoles := []string{}
-	for _, role := range args.selectRoles {
-		if slices.Contains(roleNames, role) {
-			enabledRoles = append(enabledRoles, role)
-		}
-	}
+	// selectedRoles := []string{}
+	// for _, role := range args.selectRoles {
+	// 	if slices.Contains(roleNames, role) {
+	// 		selectedRoles = append(selectedRoles, role)
+	// 	}
+	// }
+
+	selectedRoles := []string{}
+	selectedHosts := []string{}
 
 	if args.interactive {
-		m := ui.NewModel(roleNames, args.selectRoles)
+		m := ui.NewModel(roleNames, args.selectRoles, hosts)
 		tm, err := tea.NewProgram(m, tea.WithAltScreen()).Run()
 		if err != nil {
 			fmt.Printf("Error: %v", err)
@@ -167,15 +204,20 @@ func main() {
 			os.Exit(ERROR_CANCELLED)
 		}
 
-		enabledRoles = m.EnabledRoles()
+		selectedHosts = m.SelectedHosts()
+		selectedRoles = m.SelectedRoles()
 	}
 
-	if len(enabledRoles) == 0 {
+	if len(selectedRoles) == 0 {
 		fmt.Println("No roles selected.")
 		os.Exit(ERROR_NO_ROLES_SELECTED)
 	}
+	if len(selectedHosts) == 0 {
+		fmt.Println("No hosts selected.")
+		os.Exit(ERROR_NO_HOSTS_SELECTED)
+	}
 
-	err = runAnsible(playbookRoot, enabledRoles)
+	err = runAnsible(playbookRoot, selectedRoles, selectedHosts)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		os.Exit(ERROR_RUNNING_ANSIBLE)

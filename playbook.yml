@@ -1,5 +1,7 @@
 - name: Dotfiles
-  hosts: localhost
+  hosts:
+    - localhost
+    - nas
 
   vars:
     xdg_config_home: "{{ ansible_env.HOME }}/.config"

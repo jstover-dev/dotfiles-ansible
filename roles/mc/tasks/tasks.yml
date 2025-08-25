@@ -37,6 +37,7 @@
     replace: '\1={{ item.value }}'
 
 - name: "Update generated ini"
+  when: inventory_hostname == "localhost"
   ansible.builtin.copy:
     src: "{{ ini_temp.path }}"
     dest: "{{ ini_src }}"
@@ -49,7 +50,15 @@
     mode: '0755'
 
 - name: "Link ini"
+  when: inventory_hostname == "localhost"
   ansible.builtin.file:
     src: "{{ ini_src }}"
     dest: "{{ ini_dest }}"
     state: link
+
+- name: "Copy ini"
+  when: inventory_hostname != "localhost"
+  ansible.builtin.copy:
+    src: "{{ ini_src }}"
+    dest: "{{ ini_dest }}"
+    mode: '0644'
