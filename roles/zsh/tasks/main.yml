@@ -1,2 +1,3 @@
-- import_tasks: tasks.yml
-  tags: [ zsh ]
+- name: Import
+  ansible.builtin.import_tasks: tasks.yml
+  tags: [zsh]
