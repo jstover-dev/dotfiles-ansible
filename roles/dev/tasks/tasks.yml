@@ -1,0 +1,21 @@
+- name: "Install packages"
+  become: true
+  ansible.builtin.package:
+    state: present
+    name:
+      - stylua
+      - shellcheck
+
+- name: "Include roles"
+  loop:
+    - neovim
+    - vscode
+    - git
+    - mercurial
+    - asdf
+    - direnv
+  loop_control:
+    loop_var: dev_role
+  ansible.builtin.include_role:
+    name: "{{ dev_role }}"
+  tags: [dev]

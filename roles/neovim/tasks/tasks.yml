@@ -45,9 +45,10 @@
       - pynvim
       - jedi
 
-- name: "Update checksums"
-  notify: UpdateNeovimPlugins
-  ansible.builtin.copy:
-    dest: "{{ (conf_path, 'anisble.sha1') | path_join }}"
-    content: "{% for file in files.files %}{{ file.checksum }}  {{ file.path | basename }}\n{% endfor %}"
-    mode: '0644'
+# NO LONGER NEEDED WITH MOVE TO LUA/LAZYVIM
+# - name: "Update checksums"
+#   notify: UpdateNeovimPlugins
+#   ansible.builtin.copy:
+#     dest: "{{ (conf_path, 'anisble.sha1') | path_join }}"
+#     content: "{% for file in files.files %}{{ file.checksum }}  {{ file.path | basename }}\n{% endfor %}"
+#     mode: '0644'

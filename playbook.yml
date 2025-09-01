@@ -15,6 +15,7 @@
   roles:
     - core
     - profile
+    - dev
     - fonts
     - aria2
     - asdf

@@ -7,3 +7,10 @@
   ansible.builtin.package:
     name: "{{ packages }}"
     state: present
+
+- name: "Install uv (Arch)"
+  when: ansible_distribution == 'Archlinux'
+  become: true
+  ansible.builtin.package:
+    name: uv
+    state: present
