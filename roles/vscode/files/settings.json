@@ -1,0 +1,234 @@
+{
+
+    "window.title": "${activeEditorLong}",
+    "window.zoomLevel": 1,
+
+    // Prevent crash when hovering over File menu
+    "window.titleBarStyle": "custom",
+
+    "explorer.autoReveal": false,
+    "explorer.confirmDragAndDrop": false,
+
+    "editor.fontSize": 10,
+    "editor.rulers": [120],
+
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.aws-sam": true,
+        "**/.idea": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true
+    },
+
+    "outline.collapseItems": "alwaysCollapse",
+    "scm.workingSets.enabled": true,
+    "git.openRepositoryInParentFolders": "never",
+
+    // If fabiospampinato.vscode-statusbar-debugger is installed, debug buttons are unnecessary
+    //"debug.toolBarLocation": "hidden",
+
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.fontFamily": "MesloLGS NF",
+    "terminal.integrated.fontSize": 10,
+    "terminal.integrated.fontWeight": "100",
+    "terminal.integrated.fontWeightBold": "600",
+    "terminal.integrated.lineHeight": 1.0,
+
+    "workbench.colorTheme": "Jetbrains Dark Theme",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.activityBar.location": "top",
+
+    "docker.containers.description": [
+        "ContainerName",
+        "Status",
+        "Ports"
+    ],
+
+    "aws.telemetry": false,
+    "redhat.telemetry.enabled": false,
+
+    "yaml.schemaStore.url": "https://www.schemastore.org/api/json/catalog.json",
+    "yaml.schemaStore.enable": true,
+    "yaml.schemas": {
+        "file:///home/kira/.vscode-oss/extensions/continue.continue-1.2.1-linux-x64/config-yaml-schema.json": [
+            ".continue/**/*.yaml"
+        ]
+    },
+
+
+    // GO
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "go.toolsManagement.autoUpdate": true,
+    "go.toolsManagement.checkForUpdates": "off",
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always",
+            "source.addMissingImports": "always"
+        },
+    },
+    "go.formatTool": "gofmt",
+
+
+
+    // PYTHON
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //"python.languageServer": "Pylance",
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true,
+    //"python.analysis.typeCheckingMode": "basic",
+    "python.experiments.optOutFrom": ["All"],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "[python]": {
+        "editor.formatOnType": false,
+        "editor.defaultFormatter": "eeyore.yapf"
+    },
+    "yapf.args": ["--style", "${workspaceFolder}/.style.yapf"],
+
+    "basedpyright.analysis.inlayHints.callArgumentNames": false,
+    "basedpyright.analysis.inlayHints.variableTypes": false,
+    "basedpyright.analysis.typeCheckingMode": "recommended",
+    "basedpyright.analysis.diagnosticSeverityOverrides": {
+        "reportUnknownArgumentType": "hint",
+        "reportUnusedCallResult": false,
+        "reportUnknownMemberType": "hint",
+        "reportUnknownVariableType": "hint",
+        "reportOptionalMemberAccess": "hint",
+        "reportUnknownParameterType": "hint",
+        "reportExplicitAny": false,
+        "reportUntypedFunctionDecorator": false,
+    },
+
+
+    // LUA
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "Lua.workspace.library": ["/home/josh/.asdf/installs/neovim/0.10.1/share/nvim/runtime/lua"],
+    "Lua.diagnostics.globals": ["vim"],
+
+    // YAML
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    "yaml.customTags": [
+        "!Base64 scalar",
+        "!Cidr scalar",
+        "!And sequence",
+        "!Equals sequence",
+        "!If sequence",
+        "!Not sequence",
+        "!Or sequence",
+        "!Condition scalar",
+        "!FindInMap sequence",
+        "!GetAtt scalar",
+        "!GetAtt sequence",
+        "!GetAZs scalar",
+        "!ImportValue scalar",
+        "!Join sequence",
+        "!Select sequence",
+        "!Split sequence",
+        "!Sub scalar",
+        "!Transform mapping",
+        "!Ref scalar",
+        "!And",
+        "!If",
+        "!Not",
+        "!Equals",
+        "!Or",
+        "!FindInMap",
+        "!Base64",
+        "!Join",
+        "!Cidr",
+        "!Ref",
+        "!Sub",
+        "!Sub sequence",
+        "!GetAtt",
+        "!GetAZs",
+        "!ImportValue",
+        "!ImportValue sequence",
+        "!Select",
+        "!Split"
+    ],
+
+    "inlineSQL.enableDBIntegration": true,
+    "inlineSQL.dbDriver": "postgres",
+    "inlineSQL.dbHost": "localhost",
+    "inlineSQL.dbPort": 5433,
+    "inlineSQL.dbUser": "josh",
+    "inlineSQL.dbPassword": "",
+    "vim.handleKeys": {
+        "<C-p>": false
+    },
+
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
+    "[asl]": {
+        "gitlens.codeLens.scopes": [
+            "document"
+        ],
+        "editor.defaultFormatter": "amazonwebservices.aws-toolkit-vscode"
+    },
+
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
+    "gitlens.launchpad.indicator.enabled": false,
+
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "python.analysis.autoFormatStrings": true,
+
+    "window.commandCenter": false,
+    "vscode-neovim.ctrlKeysForNormalMode": [
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "o",
+        "r",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "/",
+        "]",
+        "right",
+        "left",
+        "up",
+        "down",
+        "backspace",
+        "delete"
+    ],
+    "containers.containers.description": [
+        "ContainerName",
+        "Status",
+        "Ports"
+    ],
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "docker.extension.enableComposeLanguageServer": false,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "lldb.suppressUpdateNotifications": true,
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "liveServer.settings.donotShowInfoMsg": true,
+
+}

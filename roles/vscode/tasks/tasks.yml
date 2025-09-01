@@ -1,0 +1,32 @@
+- name: Calculate paths
+  ansible.builtin.set_fact:
+    codium_conf: "{{ (xdg_config_home, 'VSCodium') | path_join }}"
+    code_conf: "{{ (xdg_config_home, 'Code - OSS') | path_join }}"
+    conf_files:
+      - keybindings.json
+      - settings.json
+
+- name: Create config paths
+  loop:
+    - codium_path
+    - code_path
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+
+
+- name: Link files
+  loop: "{{ [code_conf, codium_conf] | product(conf_files) | list }}"
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', item[1]) | path_join }}"
+    dest: "{{ (item[0], 'User', item[1]) | path_join }}"
+    state: link
+    force: true
+
+- name: Install extensions
+  loop:
+    - timonwong.shellcheck
+  ansible.builtin.shell: "codium --install-extension {{ item }}"
+  register: vscode_install_ext
+  changed_when: "'already installed' not in vscode_install_ext.stdout"

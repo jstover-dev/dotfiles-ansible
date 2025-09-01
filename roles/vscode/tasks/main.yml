@@ -1,0 +1,3 @@
+- name: Import
+  ansible.builtin.import_tasks: tasks.yml
+  tags: [vscode]

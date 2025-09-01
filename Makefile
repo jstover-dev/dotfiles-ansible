@@ -8,11 +8,11 @@ INSTALLER_SRC := $(call rwildcard,$(REPO)/installer,*.go) $(wildcard $(REPO)/ins
 
 .PHONY: apply-all
 apply-all: init
-	ansible-playbook --ask-become-pass --vault-password-file .vault-password --tags "$(TAGS)" playbook.yml
+	ansible-playbook --ask-become-pass --vault-password-file .vault-password --tags "$(TAGS)" -l localhost playbook.yml
 
 .PHONY: verbose
 verbose: init
-	ansible-playbook -vv --ask-become-pass --vault-password-file .vault-password playbook.yml
+	ansible-playbook -vv --ask-become-pass --vault-password-file .vault-password -l localhost playbook.yml
 
 .PHONY: init
 init: .vault-password group_vars/all/vault

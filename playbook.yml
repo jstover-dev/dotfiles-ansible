@@ -16,20 +16,21 @@
     - core
     - profile
     - fonts
-    - zsh
-    - asdf
-    - python
-    - neovim
     - aria2
+    - asdf
     - direnv
     - docker
-    - mc
-    - pacman
-    - tmux
-    - xmonad
-    - starship
-    - konsole
     - git
+    - kitty
+    - konsole
+    - mc
     - mercurial
     - mutt
-    - kitty
+    - neovim
+    - pacman
+    - python
+    - starship
+    - tmux
+    - vscode
+    - xmonad
+    - zsh
