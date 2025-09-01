@@ -13,3 +13,40 @@
     src: "{{ (role_path, 'files', '00-yay-news.hook') | path_join }}"
     dest: "/etc/pacman.d/hooks/00-yay-news.hook"
     mode: '0644'
+
+# TODO: Disabled until I can figure out how to run makepkg proeprly.
+#
+# - name: "yay: Check installed"
+#   ansible.builtin.shell: command -v yay1 >/dev/null 2>&1
+#   register: yay_installed
+#   ignore_errors: true
+#   changed_when: false
+
+# - name: "Install yay dependencies"
+#   become: true
+#   when: (ansible_distribution =='Archlinux') and yay_installed.rc != 0
+#   ansible.builtin.package:
+#     state: present
+#     name:
+#       - git
+#       - core/base-devel
+
+# - name: "yay: create build directory"
+#   when: (ansible_distribution =='Archlinux') and yay_installed.rc != 0
+#   ansible.builtin.tempfile:
+#     state: directory
+#     suffix: build
+#   register: "build_dir"
+
+# - name: "yay: clone repo"
+#   when: (ansible_distribution =='Archlinux') and yay_installed.rc != 0
+#   ansible.builtin.git:
+#     repo: https://aur.archlinux.org/yay-bin.git
+#     dest: "{{ (build_dir.path, 'yay-bin') | path_join }}"
+#     accept_newhostkey: true
+
+# - name: "yay: build"
+#   when: (ansible_distribution =='Archlinux') and yay_installed.rc != 0
+#   ansible.builtin.shell: makepkg -si
+#   args:
+#     chdir: "{{ (build_dir.path, 'yay-bin') | path_join }}"
