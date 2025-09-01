@@ -18,7 +18,7 @@
   register: files
   ansible.builtin.find:
     paths: "{{ (role_path, 'files') | path_join }}"
-    file_type: file
+    file_type: any
     get_checksum: true
 
 - name: "Link files"
