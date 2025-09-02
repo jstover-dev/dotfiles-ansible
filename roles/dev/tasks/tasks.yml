@@ -5,6 +5,7 @@
     name:
       - stylua
       - shellcheck
+      - basedpyright-bin
 
 - name: "Include roles"
   loop:
