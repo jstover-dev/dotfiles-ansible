@@ -1,3 +1,6 @@
+-- Options
+-------------------------------------------------------------------------------
+
 vim.o.hidden = true -- Allow switching buffer when current is unwritten
 vim.o.number = true -- Show line numbers
 
@@ -14,21 +17,6 @@ vim.o.linebreak = true -- When wrap is on, break on words not characters
 vim.o.cursorline = true -- Highlight the current line
 vim.o.termguicolors = true -- Enable 24-bit RGB colors
 
--- Enable diagnostics (LSP Errors and Warnings etc.)
-vim.diagnostic.enable = true
-vim.diagnostic.config({
-    jump = { float = true },
-})
-
-vim.keymap.set("n", "<A-d>", function()
-    vim.diagnostic.open_float()
-end)
-
--- Toggle virtual_lines with gK
-vim.keymap.set("n", "gK", function()
-    vim.diagnostic.config({ virtual_lines = not vim.diagnostic.config().virtual_lines })
-end, { desc = "Toggle diagnostic virtual_lines" })
-
 -- Map Leader Keys
 vim.g.mapleader = ","
 vim.g.maplocalleader = "\\"
@@ -36,10 +24,27 @@ vim.g.maplocalleader = "\\"
 -- Set Python path (assumes an env exists in ~/.envs/nvim)
 vim.g.python3_host_prog = os.getenv("HOME") .. "/.envs/nvim/bin/python"
 
+-- Keybindings
+-------------------------------------------------------------------------------
+
+--vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { noremap = true, silent = true, buffer = bufnr })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, bufopts)
+vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
+vim.keymap.set("v", "<leader>ca", vim.lsp.buf.code_action, bufopts)
+
+
 -- Ctrl-n toggles between relative and absolute line numbers
 vim.keymap.set("n", "<C-n>", function()
     vim.wo.relativenumber = not vim.wo.relativenumber
-end)
+end, { desc = "Toggle relative line numbers" })
+
+-- Toggle virtual_lines with gK
+vim.keymap.set("n", "gK", function()
+    vim.diagnostic.config({ virtual_lines = not vim.diagnostic.config().virtual_lines })
+end, { desc = "Toggle diagnostic virtual_lines" })
 
 if vim.g.vscode then
     -- undo/REDO via vscode
@@ -48,7 +53,15 @@ if vim.g.vscode then
     return
 end
 
--- Bootstrap lazy.nvim
+-- Diagnostics
+-------------------------------------------------------------------------------
+vim.diagnostic.enable = true
+vim.diagnostic.config({
+    jump = { float = true },
+})
+
+-- lazy.nvim
+-------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
     local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -64,10 +77,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     end
 end
 vim.opt.rtp:prepend(lazypath)
+                
 
-colourschemes = require("colourschemes")
-
--- Configure lazy.nvim
+-- Plugins
+-------------------------------------------------------------------------------
 require("lazy").setup({
     spec = {
         {
@@ -80,7 +93,7 @@ require("lazy").setup({
             end,
             dependencies = {
                 "rktjmp/lush.nvim",
-            }
+            },
         },
         {
             "catppuccin/nvim",
@@ -204,14 +217,8 @@ require("lazy").setup({
     checker = { enabled = true, notify = false },
 })
 
--- Configure coq.thirdparty
---require("coq_3p")({
---    { src = "nvimlua", short_name = "nLUA" },
---})
-
 -- Autocommands
-
--- Autocommand:  Template new files
+-------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd("BufNewFile", {
     group = vim.api.nvim_create_augroup("templates", { clear = true }),
     desc = "Load template",
