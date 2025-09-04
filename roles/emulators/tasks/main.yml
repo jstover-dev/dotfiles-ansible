@@ -1,0 +1,14 @@
+- name: "Install"
+  become: true
+  ansible.builtin.package:
+    name:
+      - retroarch
+      - retroarch-assets-ozone
+      - libretro-beetle-psx-hw
+      - libretro-genesis-plus-gx
+      - libretro-mupen64plus-next
+      - libretro-pcsx2
+      - libretro-scummvm
+      - libretro-snes9x
+      - mame-tools
+    state: present

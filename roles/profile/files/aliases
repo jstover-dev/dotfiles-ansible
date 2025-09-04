@@ -183,6 +183,9 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # list mounted devices and their size
 alias device-mounts="df -h --output=source,size,target | grep '/dev/\(mapper\|sd\|xvd\|nvme\)'"
 
+# Show display server type (X11/Wayland)
+alias display-server='loginctl show-session $(loginctl | awk "/seat0/ && /$(id -un)/{print \$1;exit}") -p Type'
+
 # Pleeeeeeeeaaaase? (run last cmd as root)
 alias pls='sudo -s eval $(fc -ln -1 | tee /dev/stderr )'
 alias please=pls
