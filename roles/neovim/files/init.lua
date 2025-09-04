@@ -1,4 +1,6 @@
--- Options
+-- vim: foldmethod=marker
+
+--: Options {{{
 -------------------------------------------------------------------------------
 
 vim.o.hidden = true -- Allow switching buffer when current is unwritten
@@ -24,7 +26,9 @@ vim.g.maplocalleader = "\\"
 -- Set Python path (assumes an env exists in ~/.envs/nvim)
 vim.g.python3_host_prog = os.getenv("HOME") .. "/.envs/nvim/bin/python"
 
--- Keybindings
+--: }}}
+
+--: Keybindings {{{
 -------------------------------------------------------------------------------
 
 --vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { noremap = true, silent = true, buffer = bufnr })
@@ -34,7 +38,6 @@ vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, bufopts)
 vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
 vim.keymap.set("v", "<leader>ca", vim.lsp.buf.code_action, bufopts)
-
 
 -- Ctrl-n toggles between relative and absolute line numbers
 vim.keymap.set("n", "<C-n>", function()
@@ -53,15 +56,48 @@ if vim.g.vscode then
     return
 end
 
--- Diagnostics
+--: }}}
+
+--: Diagnostics {{{
 -------------------------------------------------------------------------------
 vim.diagnostic.enable = true
 vim.diagnostic.config({
     jump = { float = true },
 })
+--: }}}
 
--- lazy.nvim
+--: Utility Functions {{{
+--- Replace existing commands with another command
+--- @param cmds string[] list of command names to override (e.g. {"help", "h"})
+--- @param target string the command to run instead (e.g. "FloatingHelp")
+function ReplaceCommands(cmds, target)
+    for _, cmd in ipairs(cmds) do
+        -- User commands must start with uppercase
+        if cmd:match("^[A-Z]") then
+            pcall(vim.api.nvim_del_user_command, cmd)
+            vim.api.nvim_create_user_command(cmd, function(opts)
+                vim.cmd(target .. " " .. (opts.args or ""))
+            end, { nargs = "*", force = true })
+        -- Fall back to cabbrev expensions
+        else
+            vim.cmd(string.format(
+                [[
+                cabbrev %s <c-r>=(getcmdpos() == 1 && getcmdtype() == ":" ? "%s" : "%s")<CR>
+            ]],
+                cmd,
+                target,
+                cmd
+            ))
+        end
+    end
+end
+
+--: }}}
+
+--: Plugins {{{
 -------------------------------------------------------------------------------
+
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
     local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -77,10 +113,8 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     end
 end
 vim.opt.rtp:prepend(lazypath)
-                
 
--- Plugins
--------------------------------------------------------------------------------
+-- Plugin setup
 require("lazy").setup({
     spec = {
         {
@@ -103,17 +137,27 @@ require("lazy").setup({
             init = function()
                 require("catppuccin").setup({
                     flavour = "macchiato",
+                    auto_integrations = true,
+                    transparent_background = true,
                 })
                 vim.cmd.colorscheme("catppuccin")
             end,
         },
+
+--        {
+--            -- https://github.com/ms-jpq/coq_nvim
+--            "ms-jpq/coq_nvim",
+--            branch = "coq",
+--            build = ":COQdeps",
+--        },
+
 
         {
             -- https://github.com/ms-jpq/coq_nvim
             "neovim/nvim-lspconfig",
             lazy = false,
             dependencies = {
-                { "ms-jpq/coq_nvim", branch = "coq" },
+                { "ms-jpq/coq_nvim", branch = "coq", build = ":COQdeps" },
 
                 -- Snippets
                 --{ "ms-jpq/coq.artifacts", branch = "artifacts" },
@@ -151,25 +195,90 @@ require("lazy").setup({
                 vim.lsp.enable("basedpyright")
             end,
         },
+
+        {
+            -- https://github.com/nvim-tree/nvim-tree.lua
+            "nvim-tree/nvim-tree.lua",
+            version = "*",
+            lazy = false,
+            dependencies = {
+                "nvim-tree/nvim-web-devicons",
+            },
+            keys = {
+                {"<leader>v", "<cmd>NvimTreeToggle<CR>", desc="Toggle nvim-tree panel", noremap=true, silent=true},
+            },
+            opts = {
+                sync_root_with_cwd = true,
+                filters = {
+                    git_ignored = true,
+                    custom = {
+                        "^.git$",
+                        "node_modules",
+                    },
+                },
+                renderer = {
+                    icons = {
+                        show = {
+                            git = true,
+                        },
+                        glyphs = {
+                            git = {
+                                unstaged = "!",
+                                staged = "+",
+                                deleted = "✘",
+                                renamed = "»",
+                                untracked = "?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        {
+            -- https://github.com/Tyler-Barham/floating-help.nvim
+            "Tyler-Barham/floating-help.nvim",
+            lazy = false,
+            config = function()
+                vim.keymap.set(
+                   "n",
+                   "<F1>",
+                   "<cmd>FloatingHelp<CR>",
+                   { noremap = true, silent = true, desc = "Floating help" }
+                )
+                ReplaceCommands({ "help", "h" }, "FloatingHelp")
+                ReplaceCommands({ "helpc", "helpclose" }, "FloatingHelpClose")
+            end,
+        },
+
         {
             -- https://github.com/romgrk/barbar.nvim
             "romgrk/barbar.nvim",
+            lazy = false,
+            version = "^1.0.0", -- optional: only update when a new 1.x version is released
             dependencies = {
                 "lewis6991/gitsigns.nvim", -- OPTIONAL: for git status
                 "nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
             },
-            init = function()
-                vim.g.barbar_auto_setup = false
-                vim.api.nvim_set_keymap("n", "<A-,>", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-                vim.api.nvim_set_keymap("n", "<A-.>", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
-                vim.api.nvim_set_keymap("n", "<A-c>", "<Cmd>BufferClose<CR>", { noremap = true, silent = true })
-            end,
-            opts = {},
-            version = "^1.0.0", -- optional: only update when a new 1.x version is released
+            opts = {
+                sidebar_filetypes = {
+                    NvimTree = {
+                        text = "NvimTree",
+                        align = "center",
+                    },
+                },
+            },
+            keys = {
+                {"<A-n>", ":tabnew<CR>", noremap = true, silent = true},
+                {"<A-,>", "<Cmd>BufferPrevious<CR>", noremap = true, silent = true},
+                {"<A-.>", "<Cmd>BufferNext<CR>", noremap = true, silent = true},
+                {"<A-c>", "<Cmd>BufferClose<CR>", noremap = true, silent = true},
+            },
         },
         {
             -- https://github.com/ms-jpq/chadtree
             "ms-jpq/chadtree",
+            enabled = false,
             lazy = false,
             branch = "chad",
             build = "python3 -m chadtree deps",
@@ -195,17 +304,67 @@ require("lazy").setup({
                 })
             end,
         },
+
+        {
+            "nvim-telescope/telescope.nvim",
+            tag = "0.1.8",
+            dependencies = {
+                { "nvim-lua/plenary.nvim" },
+                {
+                    -- Use Alternate repo until fix is merged:
+                    -- https://github.com/nvim-telescope/telescope-fzf-native.nvim/pull/151
+                    --"nvim-telescope/telescope-fzf-native.nvim",
+                    --branch = "archlinux-fix"
+                    "sudonym1/telescope-fzf-native.nvim",
+                    commit = "bc876d5a089558caf2266d2022131fa3ed3442ce",
+                    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+                },
+                { "nvim-tree/nvim-web-devicons", opts = {} },
+            },
+            opts = {
+                defauts = {
+                    mappings = {
+                        i = {
+                            ["<CR>"] = "select_tab",
+                        },
+                    },
+                },
+            },
+        },
+
+        {
+            -- https://github.com/pablos123/shellcheck.nvim
+            "pablos123/shellcheck.nvim",
+            config = function ()
+                require ("shellcheck-nvim").setup({
+                    shellcheck_options = {
+                        "--external-sources",
+                        "--enable=all",
+                    },
+                })
+            end
+        },
+
+
         {
             -- https://github.com/nvim-lualine/lualine.nvim
             "nvim-lualine/lualine.nvim",
             dependencies = { "nvim-tree/nvim-web-devicons" },
-            init = function()
-                require("lualine").setup({
-                    options = {
-                        theme = "codedark",
-                    },
-                })
-            end,
+            opts = {
+                options = {
+                    theme = "codedark",
+                },
+            },
+        },
+
+        {
+            -- https://github.com/akinsho/toggleterm.nvim
+            "akinsho/toggleterm.nvim",
+            version = "^2.0.0",
+            opts = {
+                open_mapping = [[<c-\>]],
+                size = 15,
+            },
         },
     },
 
@@ -217,7 +376,9 @@ require("lazy").setup({
     checker = { enabled = true, notify = false },
 })
 
--- Autocommands
+--: }}}
+
+--: Autocommands {{{
 -------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd("BufNewFile", {
     group = vim.api.nvim_create_augroup("templates", { clear = true }),
@@ -240,3 +401,5 @@ vim.api.nvim_create_autocmd("BufNewFile", {
         end
     end,
 })
+
+--: }}}

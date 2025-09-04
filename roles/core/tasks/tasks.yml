@@ -9,6 +9,7 @@
       - direnv
       - powerline
       - filelight
+      - jq
       - ripgrep
       - rsync
       - wget
