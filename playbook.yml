@@ -22,6 +22,7 @@
     - direnv
     - docker
     - git
+    - hyprland
     - kitty
     - konsole
     - mc

@@ -1,0 +1,29 @@
+- name: Install
+  become: true
+  ansible.builtin.package:
+    name:
+      - hyprland
+      - hyprpolkitagent
+      - xdg-desktop-portal-hyprland
+      - qt5-wayland
+      - qt6-wayland
+      - mako
+      - hyprpaper
+      - fuzzel
+      - network-manager-applet
+      - waybar
+      - ttf-jetbrains-mono-nerd
+
+    state: present
+
+
+- name: Link configurations
+  loop:
+    - hypr
+    - waybar
+    - fuzzel
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', item) | path_join }}"
+    dest: "{{ (xdg_config_home, item) | path_join }}"
+    state: link
+
