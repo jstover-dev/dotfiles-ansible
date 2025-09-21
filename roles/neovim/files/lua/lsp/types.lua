@@ -1,0 +1,12 @@
+-- @class ServerSpec: { name: string, config: vim.lsp.Config }
+-- A specification for an LSP server.
+--
+-- Example:
+-- local spec: ServerSpec = {
+--   name = 'pyright',
+--   config = { cmd = { 'pyright-langserver' }, filetypes = { 'python' } }
+-- }
+--
+-- @field name (string) The server name
+-- @field config (vim.lsp.Config) The LSP config object
+--

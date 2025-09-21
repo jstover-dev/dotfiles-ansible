@@ -6,6 +6,7 @@
       - stylua
       - shellcheck
       - basedpyright-bin
+      - lua-language-server
 
 - name: "Include roles"
   loop:
