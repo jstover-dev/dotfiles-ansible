@@ -3,10 +3,14 @@
   ansible.builtin.package:
     state: present
     name:
+      - lazygit
       - stylua
       - shellcheck
       - basedpyright-bin
       - lua-language-server
+      - vscode-json-languageserver
+      - vscode-css-languageserver
+      - vscode-html-languageserver 
 
 - name: "Include roles"
   loop:
