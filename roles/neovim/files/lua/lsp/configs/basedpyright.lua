@@ -6,6 +6,11 @@ return {
                 typeCheckingMode = "strict",
                 autoSearchPaths = true,
                 diagnosticMode = "workspace",
+                diagnosticSeverityOverrides = {
+                    reportUnusedCallResult = false,
+                    reportUnknownVariableType = false,
+                    reportUnknownMemberType = false,
+                },
             },
         },
     },
