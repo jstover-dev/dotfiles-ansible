@@ -1,3 +1,13 @@
+- name: Include roles
+  loop:
+    - scripts
+  loop_control:
+    loop_var: hyprland_role
+  ansible.builtin.include_role:
+    name: "{{ hyprland_role }}"
+  tags: [hyprland]
+  
+
 - name: Install
   become: true
   ansible.builtin.package:
@@ -16,9 +26,8 @@
       - waybar                  # Status Bar
       - ttf-jetbrains-mono-nerd # Font for waybar icons
       - pavucontrol             # Audio device control panel
-
-
     state: present
+
 
 - name: Link configurations
   loop:
@@ -26,6 +35,7 @@
     - waybar
     - fuzzel
     - xdg-desktop-portal
+    - wlogout
   ansible.builtin.file:
     src: "{{ (role_path, 'files', item) | path_join }}"
     dest: "{{ (xdg_config_home, item) | path_join }}"
