@@ -2,26 +2,30 @@
   become: true
   ansible.builtin.package:
     name:
+      # Base
       - hyprland
-      - hyprpolkitagent
       - xdg-desktop-portal-hyprland
-      - qt5-wayland
-      - qt6-wayland
-      - mako
-      - hyprpaper
-      - fuzzel
-      - network-manager-applet
-      - waybar
-      - ttf-jetbrains-mono-nerd
+      - hyprpolkitagent         # Authentication agent
+      - qt5-wayland             # Qt5 on Wayland support
+      - qt6-wayland             # Qt6 on Wayland support
+      - pipewire                # For screensharing etc.
+      - mako                    # Notification daemon
+      - hyprpaper               # Wallpaper app
+      - fuzzel                  # dmenu style menu app
+      - network-manager-applet  # NetworkManager systray app 
+      - waybar                  # Status Bar
+      - ttf-jetbrains-mono-nerd # Font for waybar icons
+      - pavucontrol             # Audio device control panel
+
 
     state: present
-
 
 - name: Link configurations
   loop:
     - hypr
     - waybar
     - fuzzel
+    - xdg-desktop-portal
   ansible.builtin.file:
     src: "{{ (role_path, 'files', item) | path_join }}"
     dest: "{{ (xdg_config_home, item) | path_join }}"
