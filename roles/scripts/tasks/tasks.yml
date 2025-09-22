@@ -1,0 +1,19 @@
+- name: Find files
+  ansible.builtin.find:
+    paths: "{{ (role_path, 'files') | path_join }}"
+  register: scripts
+
+- name: Create ~/.local/bin
+  ansible.builtin.file:
+    path: "{{ local_bin }}"
+    state: directory
+    mode: '0755'
+  
+
+- name: Link scripts
+  ansible.builtin.file:
+    src: "{{ (role_path, 'files', item) | path_join }}"
+    dest: "{{ (local_bin, item ) | path_join }}"
+    state: link
+  with_items: "{{ scripts.files | map(attribute='path') | map('basename') | list }}"
+
